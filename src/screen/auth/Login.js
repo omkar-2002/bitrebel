@@ -5,6 +5,7 @@ import {
   Image,
   Dimensions,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import React from 'react';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -21,18 +22,25 @@ const loginSchema = Yup.object().shape({
   email: Yup.string()
     .email('Please enter a valid email address')
     .required('Email is required'),
+  password: Yup.string().required('Password is required'),
 });
 
-export default function Login() {
+export default function Login({navigation}) {
+  const onSubmit = () => {
+    navigation.navigate('SignUp');
+  };
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={{flexGrow: 1}}
       style={styles.container}
-      extraHeight = {100}
+      extraHeight={100}
       resetScrollToCoords={{x: 0, y: 0}}
       scrollEnabled={true}>
       <Image source={LoginImg} style={styles.img} />
-      <Formik validationSchema={loginSchema} initialValues={{email: ''}}>
+      <Formik
+        onSubmit={onSubmit}
+        validationSchema={loginSchema}
+        initialValues={{email: ''}}>
         {({
           handleSubmit,
           values,
@@ -51,8 +59,9 @@ export default function Login() {
                   fontSize: 20,
                   fontWeight: 'bold',
                   color: Colors.grey.dark1,
+                  marginBottom: 10
                 }}>
-                Enter your email to get OTP
+                Enter your credentials
               </Text>
 
               <CustomInput
@@ -66,13 +75,25 @@ export default function Login() {
                 title="Email"
                 placeholder="Enter your mail"
               />
+              <CustomInput
+                value={values['password']}
+                error={errors['password']}
+                touched={touched['password']}
+                onChange={handleChange('password')}
+                onBlur={() => handleBlur('password')}
+                setFieldTouched={() => setFieldTouched('password')}
+                returnKeyType="next"
+                title="Password"
+                placeholder="Enter your password"
+              />
               <DefaultButton
                 isDisabled={!(isValid && dirty)}
                 onPress={handleSubmit}
                 type="small"
                 isFullWidth={true}
-                text="Next"
+                text="Login"
               />
+              <TouchableOpacity onPress={()=>navigation.navigate("Category")}><Text style = {{color:Colors.brandPrimary.default,textAlign:"center"}}>Register here if you don't have an account</Text></TouchableOpacity>
             </View>
           );
         }}
@@ -88,7 +109,7 @@ const styles = StyleSheet.create({
   },
   img: {
     width,
-    height: height * 0.6,
+    height: height * 0.5,
     resizeMode: 'cover',
     borderBottomLeftRadius: height / 20,
     borderBottomRightRadius: height / 20,
